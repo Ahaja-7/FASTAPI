@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, Base
 import models  # noqa: F401 — 모델 등록
-from router import router
+from posts.router import router as post_router
 
 # 테이블 자동 생성
 Base.metadata.create_all(bind=engine)
@@ -11,10 +11,10 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="게시판 API",
     description="FastAPI + MySQL 기반 게시판 CRUD API",
-    version="1.0.0",
+    version="2.0.0",
 )
 
-#CORS 설정
+# CORS 설정
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 운영 환경에서는 도메인 명시
@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router, prefix="/api/v1")
+app.include_router(post_router, prefix="/api/v1")
 
 
 @app.get("/", tags=["헬스체크"])
