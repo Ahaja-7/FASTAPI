@@ -1,0 +1,5 @@
+{"id":"log-001","text":"결제 API payment 카테고리에서 upstream timeout while waiting for payment gateway 오류가 발생했다. 응답 시간은 8520ms이고 타임아웃 여부는 Y이다."}
+{"id":"log-002","text":"인증 API auth 카테고리에서 invalid token signature 오류가 발생했다. 응답 시간은 120ms이고 타임아웃 여부는 N이다."}
+{"id":"log-003","text":"주문 API order 카테고리에서 DB 커넥션 풀 고갈 후 5xx 오류가 증가했다. 평균 응답 시간은 4300ms이다."}
+{"id":"log-004","text":"게시글 조회 posts 카테고리는 응답 시간 35ms, 타임아웃 N, 오류 메시지 없음으로 정상 처리되었다."}
+{"id":"log-005","text":"검색 API search 카테고리에서 외부 검색 공급자 rate limit 오류가 기록되었다. 응답 시간은 980ms이고 타임아웃은 발생하지 않았다."}

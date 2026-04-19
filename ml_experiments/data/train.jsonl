@@ -1,0 +1,5 @@
+{"instruction":"API 응답 로그를 보고 장애 원인을 요약해줘.","input":"카테고리: payment\n응답 시간(ms): 8520\n타임아웃: Y\n오류 메시지: upstream timeout while waiting for payment gateway","output":"결제 게이트웨이 응답 지연으로 인한 타임아웃 가능성이 높습니다. payment 카테고리의 응답 시간이 8.5초로 길고 upstream timeout 메시지가 확인됩니다."}
+{"instruction":"API 로그에서 우선 확인해야 할 조치를 알려줘.","input":"카테고리: auth\n응답 시간(ms): 120\n타임아웃: N\n오류 메시지: invalid token signature","output":"토큰 서명 검증 설정을 먼저 확인해야 합니다. 응답 지연이나 타임아웃은 아니며, 인증 토큰의 서명 키 또는 발급자 설정 불일치가 원인일 수 있습니다."}
+{"instruction":"RAG 검색 결과만 근거로 답변해줘.","input":"문서: 주문 API에서 5xx가 증가했고 DB 커넥션 풀이 고갈되었다. 평균 응답 시간은 4300ms이다.\n질문: 주문 API 지연의 원인은?","output":"검색 문서 기준으로 주문 API 지연은 DB 커넥션 풀 고갈과 관련이 있습니다. 평균 응답 시간이 4300ms로 높고 5xx 증가도 함께 관찰됩니다."}
+{"instruction":"모르는 내용은 추측하지 말고 말해줘.","input":"문서: 캐시 서버 장애 기록은 없다.\n질문: 캐시 서버가 장애 원인이야?","output":"제공된 문서만 보면 캐시 서버 장애 기록은 없습니다. 따라서 캐시 서버가 원인이라고 판단할 근거가 부족합니다."}
+{"instruction":"API 로그 분석 답변 스타일을 맞춰줘.","input":"로그 ID: 17\n응답 시간(ms): 35\n타임아웃: N\n카테고리: posts\n오류 메시지: 없음","output":"로그 ID 17은 정상 범위로 보입니다. 응답 시간이 35ms로 짧고 타임아웃 및 오류 메시지가 없습니다."}
