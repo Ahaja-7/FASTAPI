@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 from pathlib import Path
 
 import faiss
@@ -61,12 +62,19 @@ def build_prompt(question: str, retrieved_docs: list[tuple[dict, float]]) -> str
     )
     return (
         "<|im_start|>system\n"
-        "너는 한국어로 답변하는 RAG 분석 도우미다. "
-        "반드시 제공된 문서만 근거로 답하고, 근거가 없으면 모른다고 답한다."
+        "너는 한국어로 답하는 RAG 분석 도우미다. "
+        "반드시 제공된 문서만 근거로 답하고, 근거가 없으면 모른다고 답한다. "
+        "추론 과정은 출력하지 말고 최종 답변만 한국어로 작성한다."
         "<|im_end|>\n"
-        f"<|im_start|>user\n질문:\n{question}\n\n검색 문서:\n{context}<|im_end|>\n"
+        f"<|im_start|>user\n/no_think\n질문:\n{question}\n\n검색 문서:\n{context}<|im_end|>\n"
         "<|im_start|>assistant\n"
     )
+
+
+def remove_thinking(text: str) -> str:
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    text = text.replace("<think>", "").replace("</think>", "")
+    return text.strip()
 
 
 def generate_answer(tokenizer, model, prompt: str, max_new_tokens: int) -> str:
@@ -81,7 +89,7 @@ def generate_answer(tokenizer, model, prompt: str, max_new_tokens: int) -> str:
             pad_token_id=tokenizer.eos_token_id,
         )
     generated = output_ids[0][inputs["input_ids"].shape[-1]:]
-    return tokenizer.decode(generated, skip_special_tokens=True).strip()
+    return remove_thinking(tokenizer.decode(generated, skip_special_tokens=True))
 
 
 def parse_args() -> argparse.Namespace:

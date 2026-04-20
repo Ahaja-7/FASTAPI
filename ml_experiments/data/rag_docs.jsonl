@@ -1,5 +1,60 @@
-{"id":"log-001","text":"결제 API payment 카테고리에서 upstream timeout while waiting for payment gateway 오류가 발생했다. 응답 시간은 8520ms이고 타임아웃 여부는 Y이다."}
-{"id":"log-002","text":"인증 API auth 카테고리에서 invalid token signature 오류가 발생했다. 응답 시간은 120ms이고 타임아웃 여부는 N이다."}
-{"id":"log-003","text":"주문 API order 카테고리에서 DB 커넥션 풀 고갈 후 5xx 오류가 증가했다. 평균 응답 시간은 4300ms이다."}
-{"id":"log-004","text":"게시글 조회 posts 카테고리는 응답 시간 35ms, 타임아웃 N, 오류 메시지 없음으로 정상 처리되었다."}
-{"id":"log-005","text":"검색 API search 카테고리에서 외부 검색 공급자 rate limit 오류가 기록되었다. 응답 시간은 980ms이고 타임아웃은 발생하지 않았다."}
+{"id":"payment-timeout-001","text":"결제 API payment 카테고리에서 upstream timeout while waiting for payment gateway 오류가 발생했다. 응답 시간은 8520ms이고 타임아웃 여부는 Y이다. 결제 게이트웨이 응답 지연 가능성이 높다."}
+{"id":"payment-provider-002","text":"payment provider unavailable 오류는 외부 결제 공급자 장애 또는 일시적인 서비스 불가 상태와 관련될 수 있다. 오류율이 함께 증가하면 결제 공급자 상태 페이지와 외부 호출 latency를 확인해야 한다."}
+{"id":"payment-card-003","text":"card declined by issuer 또는 insufficient funds 오류는 서버 장애보다 카드사 거절이나 결제 수단 상태 문제일 가능성이 높다. 자동 재시도보다는 사용자 안내가 필요하다."}
+{"id":"payment-invalid-card-004","text":"invalid card number 오류는 입력값 오류에 가깝다. 응답 시간이 짧고 타임아웃이 없다면 결제 시스템 지연보다 사용자 입력 검증 문제로 분류한다."}
+{"id":"payment-retry-005","text":"temporary provider timeout은 제한적 재시도 대상이 될 수 있다. 결제 재시도는 중복 결제를 막기 위해 idempotency key와 상태 조회 로직을 함께 사용해야 한다."}
+{"id":"auth-token-001","text":"인증 API auth 카테고리에서 invalid token signature 오류가 발생했다. 응답 시간은 120ms이고 타임아웃 여부는 N이다. JWT secret, public key, 서명 알고리즘 불일치 가능성이 있다."}
+{"id":"auth-expired-002","text":"token expired 오류는 만료된 access token으로 인한 인증 실패를 의미한다. 클라이언트 refresh token 처리와 재로그인 흐름을 확인해야 한다."}
+{"id":"auth-claim-003","text":"missing required claim: aud 오류는 토큰 audience claim 검증 실패와 관련된다. 배포 직후 증가했다면 토큰 발급 로직과 검증 설정 변경을 확인해야 한다."}
+{"id":"auth-csrf-004","text":"invalid csrf token 오류는 CSRF 토큰 발급, 쿠키 설정, SameSite 정책, 요청 헤더 누락과 관련될 수 있다. 응답 시간이 짧다면 서버 지연보다 요청 검증 실패에 가깝다."}
+{"id":"auth-permission-005","text":"permission denied 또는 forbidden role required 오류는 권한 부족으로 인한 접근 거부 가능성이 높다. 사용자 role, 권한 매핑, 접근 제어 정책을 확인해야 한다."}
+{"id":"order-db-pool-001","text":"주문 API order 카테고리에서 DB 커넥션 풀 고갈 후 5xx 오류가 증가했다. 평균 응답 시간은 4300ms이다. DB 커넥션 풀 사용량과 대기 시간을 확인해야 한다."}
+{"id":"order-deadlock-002","text":"deadlock found when trying to get lock 오류는 주문 처리 트랜잭션 간 락 순서 충돌과 관련될 수 있다. 트랜잭션 순서, 잠금 범위, 재시도 정책을 점검해야 한다."}
+{"id":"order-lock-003","text":"order lock contention high 메시지는 주문 처리 중 락 경합이 증가했음을 의미한다. 응답 시간이 길고 오류율이 높으면 주문 처리량 제한이나 트랜잭션 최적화가 필요할 수 있다."}
+{"id":"order-discount-004","text":"null pointer while calculating discount 오류는 할인 계산 로직의 서버 내부 오류 가능성이 높다. 할인 코드 변경 이력, null 입력 케이스, 예외 처리를 확인해야 한다."}
+{"id":"checkout-timeout-001","text":"checkout orchestration timeout은 구매 완료 흐름에서 여러 하위 서비스 중 하나가 지연되었을 때 발생할 수 있다. checkout 오류는 사용자 영향도가 높다."}
+{"id":"checkout-inventory-002","text":"dependency inventory-service timeout 메시지는 checkout API가 inventory-service 응답을 기다리다 실패했음을 의미한다. inventory-service 상태와 해당 서비스의 DB/캐시 의존성을 확인해야 한다."}
+{"id":"db-connection-001","text":"database connection timeout 오류는 DB 연결 지연, 커넥션 풀 부족, DB 서버 부하와 관련될 수 있다. 커넥션 풀 active count와 wait time을 확인해야 한다."}
+{"id":"db-lock-002","text":"lock wait timeout exceeded 오류는 DB 락 대기로 인해 요청 처리가 지연되었음을 의미한다. 장기 트랜잭션, 동시 업데이트 패턴, 락 경합 테이블을 확인해야 한다."}
+{"id":"db-replica-003","text":"read replica lag exceeded threshold 오류는 읽기 복제본 지연과 관련된다. replica lag가 높으면 읽기 요청 지연이나 오래된 데이터 조회 문제가 발생할 수 있다."}
+{"id":"db-failover-004","text":"primary db failover in progress 메시지는 DB primary 전환 중임을 의미한다. 애플리케이션 DB 재연결 동작과 read/write endpoint 전환 상태를 확인해야 한다."}
+{"id":"db-query-005","text":"query execution timeout은 쿼리 실행 시간이 API timeout 한도를 초과했음을 의미한다. 실행 계획, 인덱스, 조건절, 데이터 범위, 쿼리 캐싱을 확인해야 한다."}
+{"id":"redis-cart-001","text":"cart API에서 redis command timeout이 발생했고 Redis latency가 2200ms로 증가했다. Redis CPU, 메모리, slowlog, hot key 여부를 확인해야 한다."}
+{"id":"redis-session-002","text":"session API에서 redis connection pool exhausted 메시지가 발생하면 Redis 커넥션 풀 고갈이나 connection leak 가능성이 있다. 커넥션 풀 크기와 active connection 수를 확인해야 한다."}
+{"id":"redis-overload-003","text":"Redis CPU 사용률이 95%까지 상승했고 session API에서 redis command timeout이 증가했다. Redis 과부하로 인한 API 지연 가능성이 높다."}
+{"id":"cache-product-001","text":"product API에서 cache miss storm detected 메시지가 발생했고 캐시 hit rate가 18%로 낮았다. 캐시 만료 정책, hot key, 동시 재생성 방지를 확인해야 한다."}
+{"id":"cache-missing-002","text":"캐시 서버 장애 기록이 없는 경우 캐시를 원인으로 단정할 수 없다. 캐시 관련 오류, hit rate 하락, Redis latency 같은 추가 근거가 필요하다."}
+{"id":"search-rate-limit-001","text":"검색 API search 카테고리에서 외부 검색 공급자의 rate limit 오류가 기록되었다. 응답 시간은 980ms이고 타임아웃은 발생하지 않았다. API quota와 호출량을 확인해야 한다."}
+{"id":"search-backend-002","text":"slow response from search backend 메시지는 검색 백엔드 응답 지연을 의미한다. 내부 원인이 DB, 인덱스, 네트워크 중 무엇인지는 추가 지표 없이는 단정할 수 없다."}
+{"id":"search-es-003","text":"elasticsearch circuit breaker triggered 메시지는 Elasticsearch가 메모리 보호 장치를 동작시켰음을 의미한다. heap 사용량, 고비용 쿼리, 인덱스 상태를 확인해야 한다."}
+{"id":"catalog-index-001","text":"catalog API에서 product index refresh timeout이 발생하면 상품 인덱스 갱신 지연 가능성이 높다. Elasticsearch 또는 OpenSearch refresh 정책과 인덱스 갱신 작업을 확인해야 한다."}
+{"id":"file-storage-001","text":"파일 다운로드 API에서 object storage read timeout이 증가했다. CDN cache hit ratio는 정상 범위였다. 오브젝트 스토리지 읽기 지연과 원본 접근 경로를 우선 확인해야 한다."}
+{"id":"file-upload-002","text":"payload too large 오류는 업로드 요청 본문 크기가 허용 한도를 초과했음을 의미한다. gateway body limit와 클라이언트 파일 크기 검증을 확인해야 한다."}
+{"id":"file-type-003","text":"unsupported file type 오류는 클라이언트가 허용되지 않은 파일 형식을 업로드했을 때 발생한다. 서버 장애보다 입력값 검증 실패에 가깝다."}
+{"id":"image-resize-001","text":"image resize worker timeout은 이미지 리사이즈 작업자가 제한 시간 안에 처리를 끝내지 못했음을 의미한다. 큰 이미지, 워커 처리량 부족, 큐 적체를 확인해야 한다."}
+{"id":"notification-smtp-001","text":"notification API에서 smtp server did not respond 오류와 타임아웃이 함께 발생했다. SMTP 서버 상태, 네트워크 연결, 메일 발송 큐 적체 여부를 확인해야 한다."}
+{"id":"notification-optout-002","text":"user opted out 오류는 사용자가 알림 수신을 거부한 상태를 의미한다. 시스템 장애 조치보다는 사용자 설정과 안내 메시지를 확인하면 된다."}
+{"id":"shipping-carrier-001","text":"shipping API에서 carrier API timeout 메시지가 발생하면 외부 배송사 API 지연 가능성이 높다. 배송사 API 상태, timeout 설정, fallback 처리를 확인해야 한다."}
+{"id":"gateway-route-001","text":"route not found 오류는 API Gateway 라우팅 설정 누락 또는 경로 불일치 가능성이 높다. 응답 시간이 짧다면 upstream 지연보다 라우트 설정 문제에 가깝다."}
+{"id":"gateway-upstream-002","text":"upstream connect error or disconnect/reset before headers 메시지는 upstream 서비스 연결 실패 또는 연결 초기화를 의미한다. upstream 서비스 상태와 로드밸런서 헬스체크를 확인해야 한다."}
+{"id":"websocket-handshake-001","text":"WebSocket handshake timeout은 gateway, 로드밸런서, 서버 연결 수, 네트워크 지연과 관련될 수 있다. idle timeout 설정과 연결 수 제한을 확인해야 한다."}
+{"id":"user-profile-query-001","text":"user API에서 slow query detected와 missing index 메시지가 함께 발생하면 인덱스 누락으로 인한 프로필 조회 지연 가능성이 높다. 실행 계획과 인덱스 추가 여부를 확인해야 한다."}
+{"id":"profile-downstream-001","text":"profile API에서 downstream user-preference service slow 메시지가 발생하면 user-preference 하위 서비스 지연 가능성이 높다. 해당 서비스의 응답 시간과 의존 DB 상태를 확인해야 한다."}
+{"id":"report-query-001","text":"report API에서 query execution timeout이 발생하고 쿼리 실행 시간이 전체 응답 시간의 대부분을 차지하면 리포트 쿼리 최적화가 필요하다."}
+{"id":"report-batch-002","text":"report API 응답 시간이 증가했고 최근 배치 작업이 실행되었다면 배치 작업 영향 가능성이 있다. 단, 오류 메시지가 없으면 직접 원인이라고 단정할 수 없다."}
+{"id":"billing-queue-001","text":"billing API에서 invoice generation queue backlog 메시지와 많은 큐 대기 건수가 확인되면 청구서 생성 작업자 처리량 부족이나 큐 적체가 원인일 수 있다."}
+{"id":"recommendation-model-001","text":"recommendation API에서 model inference latency high 메시지가 발생하고 모델 추론 시간이 전체 응답 시간의 대부분이면 모델 서버 지연 가능성이 높다."}
+{"id":"inventory-lock-001","text":"inventory API에서 lock wait timeout exceeded 오류가 발생하면 재고 데이터 갱신 중 DB 락 경합이 원인일 수 있다. 동시 업데이트 로직과 장기 트랜잭션을 확인해야 한다."}
+{"id":"product-normal-001","text":"게시글 조회 posts 카테고리의 응답 시간은 35ms이고, 타임아웃 여부는 N이며, 오류 메시지는 없음으로 정상 처리되었다."}
+{"id":"health-normal-001","text":"health endpoint에서 상태 코드 200, 응답 시간 12ms, 오류 메시지 없음이면 정상 로그로 판단할 수 있다."}
+{"id":"metrics-normal-001","text":"metrics endpoint에서 상태 코드 204, 응답 시간 88ms, 오류 메시지 없음이면 응답 본문 없이 성공한 정상 요청일 수 있다."}
+{"id":"login-locked-001","text":"login API에서 account locked 오류가 발생하면 시스템 지연보다 계정 잠금 정책에 따른 로그인 실패 가능성이 높다."}
+{"id":"coupon-expired-001","text":"coupon expired 오류는 쿠폰 만료로 인한 정상적인 요청 거절 가능성이 높다. 쿠폰 만료일과 사용자 안내 메시지를 확인해야 한다."}
+{"id":"review-validation-001","text":"profanity validation failed 오류는 리뷰 내용이 금칙어 검증에 실패했음을 의미한다. 시스템 장애보다 입력값 정책 위반에 가깝다."}
+{"id":"admin-report-001","text":"admin report export delayed 오류는 관리자 기능의 리포트 내보내기 지연을 의미한다. 요청 수가 적다면 사용자 영향도는 제한적일 수 있다."}
+{"id":"observability-apm-001","text":"intermittent slow response만 있는 로그는 원인을 단정하기 어렵다. APM trace, DB 지표, 캐시 지표, 외부 호출 latency를 함께 확인해야 한다."}
+{"id":"severity-high-001","text":"payment, checkout, order 같은 핵심 거래 경로에서 타임아웃과 높은 오류율이 함께 발생하면 장애 우선순위를 높게 잡아야 한다."}
+{"id":"severity-low-001","text":"응답 시간이 짧고 타임아웃이 없으며 입력값 검증 오류인 경우 시스템 장애보다 사용자 요청 오류일 가능성이 높다. 긴급 장애 대응 우선순위는 낮다."}
+{"id":"rag-policy-001","text":"RAG 답변은 제공된 문서에 있는 내용만 근거로 사용해야 한다. 특정 업체명, 내부 원인, 장애 범위가 문서에 없으면 알 수 없다고 답해야 한다."}
+{"id":"rag-policy-002","text":"문서에 DB 관련 오류, 쿼리 지연, 커넥션 문제 정보가 없으면 DB가 원인이라고 단정할 수 없다. 추가 로그와 지표가 필요하다고 답해야 한다."}
+{"id":"rag-policy-003","text":"장애 분석 답변은 원인, 근거, 조치 형식으로 작성하면 운영자가 확인해야 할 다음 행동을 빠르게 파악할 수 있다."}

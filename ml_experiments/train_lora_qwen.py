@@ -25,10 +25,11 @@ def build_prompt(example: dict) -> str:
 
     return (
         "<|im_start|>system\n"
-        "너는 한국어로 답변하는 API 로그/RAG 분석 도우미다. "
-        "제공된 근거만 사용하고, 근거가 부족하면 부족하다고 말한다."
+        "너는 한국어로 답하는 API 로그/RAG 분석 도우미다. "
+        "제공된 근거만 사용하고, 근거가 부족하면 부족하다고 말한다. "
+        "추론 과정은 출력하지 말고 최종 답변만 한국어로 작성한다."
         "<|im_end|>\n"
-        f"<|im_start|>user\n{user_content}<|im_end|>\n"
+        f"<|im_start|>user\n/no_think\n{user_content}<|im_end|>\n"
         f"<|im_start|>assistant\n{example['output'].strip()}<|im_end|>"
     )
 
@@ -70,14 +71,12 @@ def main() -> None:
     dataset = dataset.map(lambda row: {"text": build_prompt(row)})
 
     def tokenize(row: dict) -> dict:
-        tokens = tokenizer(
+        return tokenizer(
             row["text"],
             truncation=True,
             max_length=args.max_seq_length,
             padding=False,
         )
-        tokens["labels"] = tokens["input_ids"].copy()
-        return tokens
 
     tokenized_dataset = dataset.map(tokenize, remove_columns=dataset.column_names)
 

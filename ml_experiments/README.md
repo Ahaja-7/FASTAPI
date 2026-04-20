@@ -67,6 +67,52 @@ To check retrieval only without loading Qwen:
 The script prints retrieved documents and the model answer, so you can compare
 base Qwen3-0.6B vs LoRA-tuned Qwen3-0.6B on the same RAG context.
 
+## 6. Train and evaluate SMS spam LoRA
+
+This reads:
+
+```text
+\\wsl.localhost\Ubuntu-22.04\home\jekal\data\spam.csv
+```
+
+It creates stratified train/test splits, trains only on the train split, then
+evaluates the LoRA adapter on the test split.
+
+```powershell
+.\.venv\Scripts\python.exe ml_experiments\train_eval_sms_lora.py
+```
+
+Generated split files:
+
+```text
+ml_experiments\data\sms_spam_train.jsonl
+ml_experiments\data\sms_spam_test.jsonl
+```
+
+Default adapter output:
+
+```text
+ml_experiments\outputs\sms_qwen3_0_6b_lora
+```
+
+For a quick smoke test:
+
+```powershell
+.\.venv\Scripts\python.exe ml_experiments\train_eval_sms_lora.py --max-steps 1 --per-device-train-batch-size 1 --eval-limit 20
+```
+
+To create only the train/test split files without loading the model:
+
+```powershell
+.\.venv\Scripts\python.exe ml_experiments\train_eval_sms_lora.py --prepare-only
+```
+
+To evaluate an already trained adapter without training again:
+
+```powershell
+.\.venv\Scripts\python.exe ml_experiments\train_eval_sms_lora.py --skip-train
+```
+
 ## Notes
 
 - Default model: `Qwen/Qwen3-0.6B`
